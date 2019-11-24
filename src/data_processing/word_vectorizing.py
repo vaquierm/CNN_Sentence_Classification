@@ -115,7 +115,3 @@ def load_known_word_vectors(vocabulary: list):
     del word2vec_model, vocabulary
 
     return word2vec_dict, unknown_words
-
-
-if __name__ == '__main__':
-    vectorize_reviews(["hey what is going on here?", "I like ice cream", "what is up bromigos", "nudwui, hi"], "word2vec")
