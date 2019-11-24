@@ -2,6 +2,7 @@
 from src.config import positive_reviews_filepath, negative_reviews_filepath
 
 import os
+import numpy as np
 
 
 def load_reviews(sentiment: str):
@@ -25,3 +26,17 @@ def load_reviews(sentiment: str):
         reviews = list(f.readlines())
 
     return reviews
+
+
+def load_all_reviews_with_labels():
+    """
+    Loads all movie review data and returns them as a list of string with an associated numpy array for their labels
+    :return: List of strings for all movie reviews, numpy array for all labels
+    """
+    # Load positive examples
+    pos_reviews = load_reviews("pos")
+
+    # Load negative reviews
+    neg_reviews = load_reviews("neg")
+
+    return (pos_reviews + neg_reviews), np.append(np.ones(len(pos_reviews)), np.zeros(len(neg_reviews))).astype(np.int)
