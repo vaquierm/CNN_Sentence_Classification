@@ -3,3 +3,4 @@
 packages needed:
 
 - gensim
+- nltk
