@@ -1,8 +1,7 @@
 # This file contains all data loading for the Movie Review Data
-from src.config import training_data_path
+from src.config import positive_reviews_filepath, negative_reviews_filepath
 
 import os
-import glob
 
 
 def load_reviews(sentiment: str):
@@ -13,18 +12,16 @@ def load_reviews(sentiment: str):
     :return: List of strings where each string is a movie review
     """
     if sentiment == "pos":
-        directory = os.path.join(training_data_path, "pos")
+        reviews_filepath = positive_reviews_filepath
     elif sentiment == "neg":
-        directory = os.path.join(training_data_path, "neg")
+        reviews_filepath = negative_reviews_filepath
     else:
         raise Exception("The sentiment category " + sentiment + " is not recognized")
 
-    if not os.path.isdir(directory):
-        raise Exception("The path to load reviews of category " + sentiment + ": " + directory + " does not exist")
+    if not os.path.isfile(reviews_filepath):
+        raise Exception("The reviews file for sentiment " + sentiment + " at: " + reviews_filepath + " does not exist")
 
-    reviews = []
-    for review_file in glob.glob(os.path.join(directory, "*.txt")):
-        with open(review_file, "r") as f:
-            reviews.append("".join(f.readlines()))
+    with open(reviews_filepath, "r", encoding='cp1252') as f:
+        reviews = list(f.readlines())
 
     return reviews

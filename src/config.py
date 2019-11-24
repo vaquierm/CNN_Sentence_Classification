@@ -1,3 +1,4 @@
 # General file paths
 data_path = "../data"
-training_data_path = "../../data/training"
+positive_reviews_filepath = "../../data/rt-polaritydata/rt-polarity.pos"
+negative_reviews_filepath = "../../data/rt-polaritydata/rt-polarity.neg"
