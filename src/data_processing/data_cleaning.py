@@ -1,11 +1,12 @@
-# This file contains everything related to cleaning the reviews before transforming them to vector representation
+# This file contains everything related to cleaning the text data before transforming them to vector representation
 import re
 
 
-def clean_str(string):
+def __clean_str(string: str):
     """
     Tokenization/string cleaning for all datasets except for SST.
     Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
+    :param string: String to clean up
     """
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
     string = re.sub(r"\'s", " \'s", string)
@@ -23,16 +24,16 @@ def clean_str(string):
     return string.strip().lower()
 
 
-def clean_reviews(raw_reviews: list):
+def clean_text_samples(raw_text_samples: list):
     """
-    Cleans out unwanted charachters from the reviews
-    :param raw_reviews: List of strings of all reviews
-    :return: List of strings of cleaned reviews
+    Cleans out unwanted charachters from the text samples
+    :param raw_text_samples: List of strings of all text samples
+    :return: List of strings of cleaned text samples
     """
     cleaned_reviews = []
 
-    for raw_review in raw_reviews:
-        cleaned_review = clean_str(raw_review)
+    for raw_review in raw_text_samples:
+        cleaned_review = __clean_str(raw_review)
         cleaned_reviews.append(cleaned_review)
 
     return cleaned_reviews
