@@ -18,7 +18,9 @@ def save_training_history(history: dict, acc_img_path: str, loss_img_path: str):
         acc = 'accuracy'
         val_acc = 'val_accuracy'
 
-    plt.figure(1)
+    fig_id = int(np.random.uniform(1, 1000, 1)[0])
+
+    plt.figure(fig_id)
     plt.plot(history[acc])
     plt.plot(history[val_acc])
     plt.title('Model accuracy')
@@ -27,8 +29,10 @@ def save_training_history(history: dict, acc_img_path: str, loss_img_path: str):
     plt.legend(['Train', 'Test'], loc='upper left')
     plt.savefig(acc_img_path)
 
+    fig_id += 1
+
     # Plot training & validation loss values
-    plt.figure(2)
+    plt.figure(fig_id)
     plt.plot(history['loss'])
     plt.plot(history['val_loss'])
     plt.title('Model loss')
@@ -37,6 +41,7 @@ def save_training_history(history: dict, acc_img_path: str, loss_img_path: str):
     plt.legend(['Train', 'Test'], loc='upper left')
     plt.savefig(loss_img_path)
 
+    fig_id += 1
 
 def compute_average_histories(histories: list):
     """

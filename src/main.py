@@ -43,7 +43,7 @@ def k_fold_cv(dataset: str, vec_type: str, k: int = 3, save_results: bool = True
         model_checkpoint = ModelCheckpoint("temp.h5", monitor='val_accuracy', mode='max', verbose=0, save_best_only=True)
         history = model.fit(x=x_train, y=to_categorical(y_train), batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=1, callbacks=[model_checkpoint], validation_data=(x_test, to_categorical(y_test)))
 
-        # Load the best model and predict to produce a confusion matric
+        # Load the best model and predict to produce a confusion matrix
         model.load_weights("temp.h5")
         os.remove("temp.h5")
         y_pred = model.predict(x_test).argmax(axis=1)

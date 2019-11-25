@@ -67,7 +67,10 @@ class MRDataLoader(DataLoader):
 
         del reviews_text
 
-        return reviews_matrix, reviews_lables
+        # Shuffle the data since we dont want it to be sorted by classes
+        p = np.random.permutation(reviews_lables.shape[0])
+
+        return reviews_matrix[p], reviews_lables[p]
 
     @classmethod
     def __load_raw_reviews(cls, sentiment: str):

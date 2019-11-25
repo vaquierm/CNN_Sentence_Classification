@@ -12,9 +12,9 @@ WORD_VEC_LEN = 300
 
 ############# Configuration to run main ##############
 # Number of epochs to run for each fold of each dataset
-EPOCHS = 10
+EPOCHS = 20
 BATCH_SIZE = 50
 # List of the names of the datasets to evaluate ("MR": movie reviews)
 DATASETS = ["MR"]
 # Declare the list of vectors types to use. (options are: "word2vec", and "random")
-VECTOR_TYPES = ["random", "word2vec"]
+VECTOR_TYPES = ["word2vec", "random"]
