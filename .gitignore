@@ -1,5 +1,7 @@
 .idea/
 data/
+results/
+temp.h5
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
