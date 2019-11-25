@@ -5,7 +5,18 @@ from src.data_processing.word_vectorizing import vectorize_texts
 
 import os
 import numpy as np
-from keras.utils import to_categorical
+
+
+def get_data_loader(dataset_key: str):
+    """
+    Get the appropriate DataLoader
+    :param dataset_key: Key string of the data loader to get
+    :return: Data loader
+    """
+    if dataset_key == "MR":
+        return MRDataLoader
+    else:
+        raise Exception("The data set key {" + dataset_key + "} is unknown")
 
 
 class DataLoader:
@@ -14,8 +25,9 @@ class DataLoader:
         """
         Loads the text data in matrix form with associated labels
         :param vector_type: Either word2vec or random
-        :return: numpy array of shape (n, max_words, WORD_VEC_LEN, 1) containing all reviews, numpy array of shape (n, num_classes) for labels
+        :return: numpy array of shape (n, max_words, WORD_VEC_LEN, 1) containing all reviews, numpy array of shape (n,) for labels
         """
+        pass
 
     @classmethod
     def load_raw_text_and_labels(cls):
@@ -23,6 +35,15 @@ class DataLoader:
         Loads the raw text data and the labels associated
         :return: List of strings for each text sample, np array with associated label
         """
+        pass
+
+    @classmethod
+    def get_class_labels(cls):
+        """
+        Get a list of strings corresponding to the class labels
+        :return: List of labels
+        """
+        pass
 
 
 # This data loader takes care of loading all data associated with the movie reviews dataset
@@ -33,7 +54,7 @@ class MRDataLoader(DataLoader):
         """
         Loads the raw reviews data and converts it to matrix format
         :param vector_type: Either word2vec or random
-        :return: numpy array of shape (n, max_words, WORD_VEC_LEN, 1) containing all reviews, numpy array of shape (n, 2) for labels
+        :return: numpy array of shape (n, max_words, WORD_VEC_LEN, 1) containing all reviews, numpy array of shape (n,) for labels
         """
         # Load the reviews and associated labels
         reviews_text, reviews_lables = cls.load_raw_text_and_labels()
@@ -46,7 +67,10 @@ class MRDataLoader(DataLoader):
 
         del reviews_text
 
-        return reviews_matrix, to_categorical(reviews_lables, dtype="int")
+        # Shuffle the data since we dont want it to be sorted by classes
+        p = np.random.permutation(reviews_lables.shape[0])
+
+        return reviews_matrix[p], reviews_lables[p]
 
     @classmethod
     def __load_raw_reviews(cls, sentiment: str):
@@ -84,3 +108,11 @@ class MRDataLoader(DataLoader):
         neg_reviews = cls.__load_raw_reviews("neg")
 
         return (pos_reviews + neg_reviews), np.append(np.ones(len(pos_reviews)), np.zeros(len(neg_reviews))).astype(np.int)
+
+    @classmethod
+    def get_class_labels(cls):
+        """
+        Get a list of strings corresponding to the class labels
+        :return: List of labels
+        """
+        return ["Negative", "Positive"]
