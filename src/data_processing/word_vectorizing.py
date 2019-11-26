@@ -8,54 +8,75 @@ from sklearn.feature_extraction.text import CountVectorizer
 from nltk import word_tokenize
 
 
-def vectorize_texts(text_samples: list, vector_type: str):
+def generate_word_embeddings(text_samples: list, vector_type: str):
     """
-    Vectorize all text samples by converting each words to a vector representation
-    :param text_samples: List of strings containing the text samples
-    :param vector_type: Either word2vec or random
-    :return: numpy array of shape (n, max_words, WORD_VEC_LEN, 1) where n is the number of samples, max_words is the max number of words in a review
+    Generate the word embeddings with the input data, encode the input data according to that embedding
+    :param text_samples: List of strings corresponding to the text samples
+    :param vector_type: Either vord2vec or random
+    :return: Encoded text samples (N, max_word_len), embedding matrix (vocab_size, WORD_VEC_LEN)
     """
     # Build the vocabulary
     vectorizer = CountVectorizer(tokenizer=word_tokenize)
     vectorizer.fit(text_samples)
-    vocabulary = list(vectorizer.vocabulary_.keys())
+    vocabulary_map = vectorizer.vocabulary_
+
     del vectorizer
 
     # Create the word to vec mapping
     if vector_type == "random":
-        word2vec_dict = __create_word_to_vec_mapping(vocabulary, random=True)
+        word2vec_dict = __create_word_to_vec_mapping(list(vocabulary_map.keys()), random=True)
     elif vector_type == "word2vec":
-        word2vec_dict = __create_word_to_vec_mapping(vocabulary, random=False)
+        word2vec_dict = __create_word_to_vec_mapping(list(vocabulary_map.keys()), random=False)
     else:
         raise Exception("The type of word 2 vec mapping " + vector_type + " is unknown")
 
-    matrix_form_text_samples = __transform_text_samples_to_matrices(text_samples, word2vec_dict)
-    del text_samples, word2vec_dict
-
-    return matrix_form_text_samples.reshape(matrix_form_text_samples.shape + (1,))
+    return __encode_text(text_samples, vocabulary_map), __create_word_embedding_matrix(vocabulary_map, word2vec_dict)
 
 
-def __transform_text_samples_to_matrices(text_samples: list, word2vec_dict: dict):
+def __encode_text(text_samples: list, vocabulary_map: dict):
     """
-    Uses the complete word to vec dictionary to build matrices for each text sample
-    :param text_samples: List of strings for N text samples
-    :param word2vec_dict: Mapping from all words in the vocab to their vector representation
-    :return: Numpy array of shape (N, max_words, WORD_VEC_LEN)
+    Encode each text sample into a format of a 1D array where each entry corresponds to a word.
+    The value at each index is the index of that word in the vocabulary
+    :param text_samples: List of strings of all text samples
+    :param vocabulary_map: Mapping of each words in the vocab to its index
+    :return: The newly encoded data
     """
     N = len(text_samples)
     max_words = max([len(word_tokenize(sample)) for sample in text_samples])
 
-    # Create the buffer that will hold the data
-    matrix_text_samples = np.zeros((N, max_words, WORD_VEC_LEN), dtype=np.float)
+    encoded_sentences = np.zeros((N, max_words), dtype=np.int)
 
     for n in range(len(text_samples)):
         text_sample = text_samples[n]
         # Tokenize the word to create its word-wise vector matrix representation
         words = word_tokenize(text_sample)
         for j in range(len(words)):
-            matrix_text_samples[n][j] = word2vec_dict[words[j]]
+            # The +1 is because the index 0 is reserved for the empty word token
+            encoded_sentences[n][j] = vocabulary_map[words[j]] + 1
 
-    return matrix_text_samples
+    return encoded_sentences
+
+
+def __create_word_embedding_matrix(vocabulary_map: dict, word2vec_dict: dict):
+    """
+    Create the word embedding matrix using the index map for each words and the word to vector map
+    :param vocabulary_map: Mapping from all words to the index in the vocab
+    :param word2vec_dict: Mapping from all words in the vocab to their vector representation
+    :return: Word embedding matrix as np array of shape (len(vocab), WORD_VEC_LEN)
+    """
+    if not len(list(vocabulary_map.keys())) == len(list(word2vec_dict.keys())):
+        raise Exception("Something went wrong. Missing some vector representation of words...")
+
+    # The +1 is for the empty word token
+    embedding_matrix = np.empty((len(list(vocabulary_map.keys())) + 1, WORD_VEC_LEN))
+
+    embedding_matrix[0] = np.zeros(WORD_VEC_LEN)
+
+    for word in vocabulary_map.keys():
+        index = vocabulary_map[word]
+        embedding_matrix[index + 1] = word2vec_dict[word]
+
+    return embedding_matrix
 
 
 def __create_word_to_vec_mapping(vocabulary: list, random: bool):

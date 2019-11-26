@@ -24,7 +24,7 @@ def k_fold_cv(dataset: str, vec_type: str, k: int = 3, save_results: bool = True
 
     # Load the dataset with the correct vector representation
     print("\tLoading dataset {" + dataset + "} with vector representation {" + vec_type + "}...")
-    X, Y = data_loader.load_matrix_and_labels(vec_type)
+    X, Y = data_loader.load_X_Y_embeddings(vec_type)
 
     class_labels = data_loader.get_class_labels()
     num_classes = len(class_labels)
