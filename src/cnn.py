@@ -1,42 +1,57 @@
-from src.config import WORD_VEC_LEN
+from src.config import WORD_VEC_LEN, FEATURE_MAPS, KERNEL_SIZES
 
-from keras import Sequential, Input, Model, regularizers
-from keras.layers import Dense, Conv2D, Dropout, Flatten, MaxPool2D, Concatenate
+import numpy as np
+from keras import Input, Model, regularizers # TODO We need to regularize
+from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
 
 
-# https://stackoverflow.com/questions/43151775/how-to-have-parallel-convolutional-layers-in-keras
-def get_cnn_model(input_shape, num_categories):
-    kernel_sizes = {3, 4, 5}
-    filters = 100
-    input = Input(shape=input_shape)
-    layers = []
+def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarray, static_embedding: bool):
+    """
+    Get the CNN for text classification
+    :param input_shape: Should be (max_words_in_sample,)
+    :param num_categories: The number of classes
+    :param embedding_matrix: The matrix used for word embeddings
+    :param static_embedding: True if the embeddings should not change
+    :return: Model
+    """
+    if len(input_shape) > 1:
+        raise Exception("Something went wrong, the input shape should be 1 dimension")
 
-    for k in kernel_sizes:
-        layer = Conv2D(filters=filters, kernel_size=(k, WORD_VEC_LEN), padding='valid', activation='relu', batch_size=50, input_shape=input_shape, kernel_regularizer=regularizers.l2(3))(input)
-        # max-over-time pooling
-        # the pool shape needs to be (1, sequence_length)
-        pool = MaxPool2D(pool_size=(input_shape[0] - int(k/2) - 2, 1), padding='valid')(layer)
-        layers.append(pool)
+    max_word_length = input_shape[0]
 
-    output = Concatenate()(layers)
-    convolutional_layer = Model(input=input, output=output)
+    input = Input(shape=input_shape, dtype='int32', name='input')
 
-    convolutional_layer.summary()
+    # Embedding layer
+    flow = Embedding(input_dim=embedding_matrix.shape[0], output_dim=WORD_VEC_LEN, input_length=max_word_length, weights=[embedding_matrix], trainable=(not static_embedding), name='embedding')(input)
 
-    model = Sequential()
-    # the model uses ReLU, filter windows (h) of 3, 4, 5 with 100 feature maps each, dropout rate (p) of 0.5,
-    # l2 constraint (s) of 3, and mini-batch size of 50
-    # with padding
-    model.add(convolutional_layer)
-    model.add(Dropout(0.5))
-    model.add(Flatten())
-    model.add(Dense(num_categories, activation='softmax'))
-    model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+    convs = []
+    for kernel_size in KERNEL_SIZES:
+        convs.append(__get_conv_pool_layer(flow, max_word_length, kernel_size))
 
-    model.summary()
+    # Merge all three branches
+    out = concatenate(convs, axis=-1)
+
+    # Add the dropout layer
+    out = Dropout(0.5)(out)
+
+    out = Dense(num_categories, activation='softmax', name='output')(out)
+
+    model = Model(inputs=input, outputs=out)
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
     return model
 
 
-if __name__ == '__main__':
-    model = get_cnn_model((300, 100, 1), 2)
-    model.summary()
+def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int):
+    """
+    Create a 1D convolution layer followed by a max over time pooling
+    :param input: Input tensor
+    :param max_word_length: Maximum number of words in text sample
+    :param kernel_size: Size of window
+    :return: The output tensor
+    """
+    out = Conv1D(filters=FEATURE_MAPS, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size))(input)
+    out = MaxPooling1D(pool_size=max_word_length - kernel_size + 1, strides=None, padding='valid',
+                          name='max_pooling_k' + str(kernel_size))(out)
+    out = Flatten(name='flatten_k' + str(kernel_size))(out)
+    return out

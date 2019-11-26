@@ -1,7 +1,7 @@
 # This is the main script that will train, evaluate, and generate results
 from src.config import VECTOR_TYPES, DATASETS, EPOCHS, BATCH_SIZE, results_path
 from src.data_processing.data_loading import get_data_loader
-from src.cnn import get_cnn_model
+from src.cnn import get_cnn
 from src.util.results import save_training_history, save_confusion_matrix, compute_average_histories
 
 import numpy as np
@@ -24,7 +24,7 @@ def k_fold_cv(dataset: str, vec_type: str, k: int = 3, save_results: bool = True
 
     # Load the dataset with the correct vector representation
     print("\tLoading dataset {" + dataset + "} with vector representation {" + vec_type + "}...")
-    X, Y = data_loader.load_X_Y_embeddings(vec_type)
+    X, Y, embeddings = data_loader.load_X_Y_embeddings(vec_type)
 
     class_labels = data_loader.get_class_labels()
     num_classes = len(class_labels)
@@ -38,7 +38,7 @@ def k_fold_cv(dataset: str, vec_type: str, k: int = 3, save_results: bool = True
         x_train, x_test = X[train_index], X[test_index]
         y_train, y_test = Y[train_index], Y[test_index]
 
-        model = get_cnn_model(input_shape=X[1].shape, num_categories=num_classes)
+        model = get_cnn(input_shape=X[0].shape, num_categories=num_classes, embedding_matrix=embeddings, static_embedding=False)
 
         model_checkpoint = ModelCheckpoint("temp.h5", monitor='val_accuracy', mode='max', verbose=0, save_best_only=True)
         history = model.fit(x=x_train, y=to_categorical(y_train), batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=1, callbacks=[model_checkpoint], validation_data=(x_test, to_categorical(y_test)))
