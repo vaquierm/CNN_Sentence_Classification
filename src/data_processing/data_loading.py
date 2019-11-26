@@ -1,7 +1,7 @@
 # This file contains all data loading for all datasets
 from src.config import positive_reviews_filepath, negative_reviews_filepath
 from src.data_processing.data_cleaning import clean_text_samples
-from src.data_processing.word_vectorizing import vectorize_texts
+from src.data_processing.word_vectorizing import generate_word_embeddings
 
 import os
 import numpy as np
@@ -21,7 +21,7 @@ def get_data_loader(dataset_key: str):
 
 class DataLoader:
     @classmethod
-    def load_matrix_and_labels(cls, vector_type: str):
+    def load_X_Y_embeddings(cls, vector_type: str):
         """
         Loads the text data in matrix form with associated labels
         :param vector_type: Either word2vec or random
@@ -50,9 +50,9 @@ class DataLoader:
 class MRDataLoader(DataLoader):
 
     @classmethod
-    def load_matrix_and_labels(cls, vector_type: str):
+    def load_X_Y_embeddings(cls, vector_type: str):
         """
-        Loads the raw reviews data and converts it to matrix format
+        Loads the raw reviews data and converts it the index encoding after creating an embedding matrix
         :param vector_type: Either word2vec or random
         :return: numpy array of shape (n, max_words, WORD_VEC_LEN, 1) containing all reviews, numpy array of shape (n,) for labels
         """
@@ -63,14 +63,14 @@ class MRDataLoader(DataLoader):
         reviews_text = clean_text_samples(reviews_text)
 
         # Transform the reviews into matrix form
-        reviews_matrix = vectorize_texts(reviews_text, vector_type)
+        encoded_reviews, embedding_matrix = generate_word_embeddings(reviews_text, vector_type)
 
         del reviews_text
 
         # Shuffle the data since we dont want it to be sorted by classes
         p = np.random.permutation(reviews_lables.shape[0])
 
-        return reviews_matrix[p], reviews_lables[p]
+        return encoded_reviews[p], reviews_lables[p], embedding_matrix
 
     @classmethod
     def __load_raw_reviews(cls, sentiment: str):
