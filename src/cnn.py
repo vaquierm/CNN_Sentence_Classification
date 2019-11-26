@@ -5,17 +5,24 @@ from keras import Input, Model, regularizers # TODO We need to regularize
 from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
 
 
-def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarray, static_embedding: bool):
+def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarray, embedding_option: str):
     """
     Get the CNN for text classification
     :param input_shape: Should be (max_words_in_sample,)
     :param num_categories: The number of classes
     :param embedding_matrix: The matrix used for word embeddings
-    :param static_embedding: True if the embeddings should not change
+    :param embedding_option: Weather or not the embedding is static or dynamic
     :return: Model
     """
     if len(input_shape) > 1:
         raise Exception("Something went wrong, the input shape should be 1 dimension")
+
+    if embedding_option == "static":
+        static_embedding = True
+    elif embedding_option == "dynamic":
+        static_embedding = False
+    else:
+        raise Exception("The embedding option: " + embedding_option + " is not known. (Must be 'static' or 'dynamic')")
 
     max_word_length = input_shape[0]
 
@@ -37,7 +44,7 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     out = Dense(num_categories, activation='softmax', name='output')(out)
 
     model = Model(inputs=input, outputs=out)
-    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
     return model
 
