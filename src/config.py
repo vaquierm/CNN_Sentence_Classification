@@ -17,12 +17,15 @@ WORD_VEC_LEN = 300
 ############# Model Configurations #############
 FEATURE_MAPS = 100
 KERNEL_SIZES = [3, 4, 5]
+REGULARIZATION_STRENGTH = 0.01
 
 ############# Configuration to run main ##############
+# If True, one print statement will be printed every epoch
+PRINT_EPOCH_UPDATES = True
 # Run 5 folds (If true, runs a 5 fold validation, if false, all results are evaluated on one fold)
 RUN_5_FOLD = False
 # Number of epochs to run for each fold of each dataset
-EPOCHS = 10
+EPOCHS = 2
 # Batch size to use
 BATCH_SIZE = 50
 # List of the names of the datasets to evaluate ("MR": movie reviews)
