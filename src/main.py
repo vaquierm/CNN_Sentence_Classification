@@ -78,7 +78,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
 
         save_training_history(average_history, os.path.join(result_sub_dir, "acc.png"), os.path.join(result_sub_dir, "loss.png"))
 
-        save_confusion_matrix(confusion_mat, class_labels, os.path.join(result_sub_dir, "conf.png"), title="Acc: " + str(round(average_accuracy, 2)) + ", Dataset: " + dataset + ", Vec: " + vec_type + "_" + embedding_option)
+        save_confusion_matrix(confusion_mat, class_labels, os.path.join(result_sub_dir, "conf.png"), title="Acc: " + str(round(average_accuracy, 4)) + ", Dataset: " + dataset + ", Vec: " + vec_type + "_" + embedding_option)
 
 
 def main():
