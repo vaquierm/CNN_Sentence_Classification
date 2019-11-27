@@ -1,7 +1,7 @@
-from src.config import WORD_VEC_LEN, FEATURE_MAPS, KERNEL_SIZES
+from src.config import WORD_VEC_LEN, FEATURE_MAPS, KERNEL_SIZES, REGULARIZATION_STRENGTH
 
 import numpy as np
-from keras import Input, Model, regularizers # TODO We need to regularize
+from keras import Input, Model, regularizers
 from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
 
 
@@ -24,6 +24,9 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     else:
         raise Exception("The embedding option: " + embedding_option + " is not known. (Must be 'static' or 'dynamic')")
 
+    if REGULARIZATION_STRENGTH < 0:
+        raise Exception("Regularization strength cannot be negative, it must be a small positive number")
+
     max_word_length = input_shape[0]
 
     input = Input(shape=input_shape, dtype='int32', name='input')
@@ -41,7 +44,7 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     # Add the dropout layer
     out = Dropout(0.5)(out)
 
-    out = Dense(num_categories, activation='softmax', name='output')(out)
+    out = Dense(num_categories, activation='softmax', name='output', kernel_regularizer=regularizers.l2(REGULARIZATION_STRENGTH))(out)
 
     model = Model(inputs=input, outputs=out)
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -57,7 +60,7 @@ def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int):
     :param kernel_size: Size of window
     :return: The output tensor
     """
-    out = Conv1D(filters=FEATURE_MAPS, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size))(input)
+    out = Conv1D(filters=FEATURE_MAPS, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(REGULARIZATION_STRENGTH))(input)
     out = MaxPooling1D(pool_size=max_word_length - kernel_size + 1, strides=None, padding='valid',
                           name='max_pooling_k' + str(kernel_size))(out)
     out = Flatten(name='flatten_k' + str(kernel_size))(out)

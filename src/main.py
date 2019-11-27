@@ -1,5 +1,5 @@
 # This is the main script that will train, evaluate, and generate results
-from src.config import RUN_5_FOLD, VECTOR_TYPES, DATASETS, EMBEDDING_OPTIONS, EPOCHS, BATCH_SIZE, results_path
+from src.config import RUN_5_FOLD, VECTOR_TYPES, DATASETS, EMBEDDING_OPTIONS, EPOCHS, BATCH_SIZE, KERNEL_SIZES, results_path, PRINT_EPOCH_UPDATES, FEATURE_MAPS, REGULARIZATION_STRENGTH
 from src.data_processing.data_loading import get_data_loader
 from src.cnn import get_cnn
 from src.util.results import save_training_history, save_confusion_matrix, compute_average_histories
@@ -46,7 +46,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
 
         reduce_lr = ReduceLROnPlateau(monitor='val_accuracy', factor=0.5, patience=3, verbose=0, min_lr=0.00001)
         model_checkpoint = ModelCheckpoint("temp.h5", monitor='val_accuracy', mode='max', verbose=0, save_best_only=True)
-        history = model.fit(x=x_train, y=to_categorical(y_train), batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=0, callbacks=[model_checkpoint, reduce_lr], validation_data=(x_test, to_categorical(y_test)))
+        history = model.fit(x=x_train, y=to_categorical(y_train), batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=2 if PRINT_EPOCH_UPDATES else 0, callbacks=[model_checkpoint, reduce_lr], validation_data=(x_test, to_categorical(y_test)))
 
         # Load the best model and predict to produce a confusion matrix
         model.load_weights("temp.h5")
@@ -82,6 +82,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
 
 
 def main():
+    print("Evaluating model with parameters:\n\tkernel sizes: " + str(KERNEL_SIZES) + "\n\t# feature maps: " + str(FEATURE_MAPS) + "\n\tFregularization strength: " + str(REGULARIZATION_STRENGTH))
 
     for dataset in DATASETS:
         for vec_type in VECTOR_TYPES:

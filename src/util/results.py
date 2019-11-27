@@ -112,5 +112,6 @@ def save_confusion_matrix(cm: np.ndarray, classes,
             ax.text(j, i, format(cm[i, j], fmt),
                     ha="center", va="center",
                     color="white" if cm[i, j] > thresh else "black")
+    ax.set_ylim(len(classes) - 0.5, -0.5)
     fig.tight_layout()
     fig.savefig(fig_file_path)
