@@ -22,8 +22,8 @@ WORD_VEC_LEN = 300
 FEATURE_MAPS = 100
 # Default [3, 4, 5]
 KERNEL_SIZES = [3, 4, 5]
-# Default 0.01
-REGULARIZATION_STRENGTH = 0.01
+# Default 0.001
+REGULARIZATION_STRENGTH = 0.001
 # Default 0.5
 DROPOUT_RATE = 0.5
 # Default adadelta
@@ -34,7 +34,7 @@ OPTIMIZER = "adadelta"
 # If True, one print statement will be printed every epoch
 PRINT_EPOCH_UPDATES = False
 # Run 5 folds (If true, runs a 5 fold validation, if false, all results are evaluated on one fold)
-RUN_5_FOLD = False
+RUN_5_FOLD = True
 # Number of epochs to run for each fold of each dataset
 EPOCHS = 50
 # Batch size to use
