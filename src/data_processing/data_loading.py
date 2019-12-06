@@ -1,5 +1,5 @@
 # This file contains all data loading for all datasets
-from src.config import positive_reviews_filepath, negative_reviews_filepath, objective_quotes_filepath, subjective_quotes_filepath
+from src.config import data_path, positive_reviews_filepath, negative_reviews_filepath, objective_quotes_filepath, subjective_quotes_filepath
 from src.data_processing.data_cleaning import clean_text_samples
 from src.data_processing.word_vectorizing import generate_word_embeddings
 
@@ -83,9 +83,9 @@ class MRDataLoader(DataLoader):
         :return: List of strings where each string is a movie review
         """
         if sentiment == "pos":
-            reviews_filepath = positive_reviews_filepath
+            reviews_filepath = os.path.join(data_path, positive_reviews_filepath)
         elif sentiment == "neg":
-            reviews_filepath = negative_reviews_filepath
+            reviews_filepath = os.path.join(data_path, negative_reviews_filepath)
         else:
             raise Exception("The sentiment category " + sentiment + " is not recognized")
 
@@ -168,9 +168,9 @@ class SUBJDataLoader(DataLoader):
         Loads all quotes data and returns them as a list of string with an associated numpy array for their labels
         :return: List of strings for all quotes, numpy array for all labels
         """
-        objective_quotes = cls.__load_raw_quotes(objective_quotes_filepath)
+        objective_quotes = cls.__load_raw_quotes(os.path.join(data_path, objective_quotes_filepath))
 
-        subjective_quotes = cls.__load_raw_quotes(subjective_quotes_filepath)
+        subjective_quotes = cls.__load_raw_quotes(os.path.join(data_path, subjective_quotes_filepath))
 
         return (objective_quotes + subjective_quotes), np.append(np.ones(len(objective_quotes)), np.zeros(len(subjective_quotes))).astype(np.int)
 

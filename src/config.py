@@ -2,11 +2,14 @@
 data_path = "../data"
 results_path = "../results"
 
-positive_reviews_filepath = "../data/rt-polaritydata/rt-polarity.pos"
-negative_reviews_filepath = "../data/rt-polaritydata/rt-polarity.neg"
+# Data file paths
+# Note: All paths below are relative filepaths from the data_path folder
+# example: word2vec_filename should be located at "data_path/word2vec_filename"
+positive_reviews_filepath = "rt-polaritydata/rt-polarity.pos"
+negative_reviews_filepath = "rt-polaritydata/rt-polarity.neg"
 
-subjective_quotes_filepath = "../data/SUBJ/quote.tok.gt9.5000"
-objective_quotes_filepath = "../data/SUBJ/plot.tok.gt9.5000"
+subjective_quotes_filepath = "SUBJ/quote.tok.gt9.5000"
+objective_quotes_filepath = "SUBJ/plot.tok.gt9.5000"
 
 word2vec_filename = "GoogleNews-vectors-negative300.bin"
 
@@ -29,7 +32,7 @@ OPTIMIZER = "adadelta"
 
 ############# Configuration to run main ##############
 # If True, one print statement will be printed every epoch
-PRINT_EPOCH_UPDATES = True
+PRINT_EPOCH_UPDATES = False
 # Run 5 folds (If true, runs a 5 fold validation, if false, all results are evaluated on one fold)
 RUN_5_FOLD = False
 # Number of epochs to run for each fold of each dataset
