@@ -1,8 +1,16 @@
-from src.config import WORD_VEC_LEN, FEATURE_MAPS, KERNEL_SIZES, REGULARIZATION_STRENGTH
+from src.config import WORD_VEC_LEN, FEATURE_MAPS, KERNEL_SIZES, REGULARIZATION_STRENGTH, OPTIMIZER, DROPOUT_RATE
 
 import numpy as np
 from keras import Input, Model, regularizers
 from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
+
+
+def get_model_config_string():
+    """
+    Get a string encoding the configuration of the model used
+    :return: String representation of the configuration used
+    """
+    return "FeatureMaps=" + str(FEATURE_MAPS) + "_KernelSizes=" + str(KERNEL_SIZES).replace(' ', '') + "Regularization=" + str(REGULARIZATION_STRENGTH) + "_Dropout=" + str(DROPOUT_RATE) + "_Optimizer=" + OPTIMIZER
 
 
 def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarray, embedding_option: str):
@@ -42,12 +50,15 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     out = concatenate(convs, axis=-1)
 
     # Add the dropout layer
-    out = Dropout(0.5)(out)
+    if ((not type(DROPOUT_RATE) == float) and (not type(DROPOUT_RATE) == int)) or DROPOUT_RATE >= 1 or DROPOUT_RATE < 0:
+        raise Exception("The dropout rate must be between 0 and 1")
+
+    out = Dropout(DROPOUT_RATE)(out)
 
     out = Dense(num_categories, activation='softmax', name='output', kernel_regularizer=regularizers.l2(REGULARIZATION_STRENGTH))(out)
 
     model = Model(inputs=input, outputs=out)
-    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer=OPTIMIZER, metrics=['accuracy'])
 
     return model
 
