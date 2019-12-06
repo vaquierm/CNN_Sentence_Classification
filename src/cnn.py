@@ -46,8 +46,13 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     for kernel_size in KERNEL_SIZES:
         convs.append(__get_conv_pool_layer(flow, max_word_length, kernel_size))
 
-    # Merge all three branches
-    out = concatenate(convs, axis=-1)
+    if len(convs) == 0:
+        raise Exception("The model needs at least one convolution layer")
+    elif len(convs) == 1:
+        out = convs[0]
+    else:
+        # Merge all three branches
+        out = concatenate(convs, axis=-1)
 
     # Add the dropout layer
     if ((not type(DROPOUT_RATE) == float) and (not type(DROPOUT_RATE) == int)) or DROPOUT_RATE >= 1 or DROPOUT_RATE < 0:
