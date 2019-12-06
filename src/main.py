@@ -1,7 +1,7 @@
 # This is the main script that will train, evaluate, and generate results
-from src.config import RUN_5_FOLD, VECTOR_TYPES, DATASETS, EMBEDDING_OPTIONS, EPOCHS, BATCH_SIZE, KERNEL_SIZES, results_path, PRINT_EPOCH_UPDATES, FEATURE_MAPS, REGULARIZATION_STRENGTH
+from src.config import RUN_5_FOLD, VECTOR_TYPES, DATASETS, EMBEDDING_OPTIONS, EPOCHS, BATCH_SIZE, KERNEL_SIZES, results_path, PRINT_EPOCH_UPDATES, FEATURE_MAPS, REGULARIZATION_STRENGTH, DROPOUT_RATE, OPTIMIZER
 from src.data_processing.data_loading import get_data_loader
-from src.cnn import get_cnn
+from src.cnn import get_cnn, get_model_config_string
 from src.util.results import save_training_history, save_confusion_matrix, compute_average_histories
 
 import numpy as np
@@ -68,7 +68,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
     print("\tAverage accuracy: " + str(average_accuracy))
 
     if save_results:
-        result_sub_dir = os.path.join(results_path, dataset, embedding_option, vec_type)
+        result_sub_dir = os.path.join(results_path, dataset, embedding_option, vec_type, get_model_config_string())
 
         # Create the subfolder if it does not exist
         if not os.path.exists(result_sub_dir):
@@ -82,7 +82,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
 
 
 def main():
-    print("Evaluating model with parameters:\n\tkernel sizes: " + str(KERNEL_SIZES) + "\n\t# feature maps: " + str(FEATURE_MAPS) + "\n\tFregularization strength: " + str(REGULARIZATION_STRENGTH))
+    print("Evaluating model with parameters:\n\tkernel sizes: " + str(KERNEL_SIZES) + "\n\t# feature maps: " + str(FEATURE_MAPS) + "\n\tRegularization strength: " + str(REGULARIZATION_STRENGTH) + "\n\tDropout rate: " + str(DROPOUT_RATE) + "\n\tOptimizer: " + OPTIMIZER)
 
     for dataset in DATASETS:
         for vec_type in VECTOR_TYPES:
