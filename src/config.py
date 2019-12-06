@@ -36,7 +36,7 @@ PRINT_EPOCH_UPDATES = False
 # Run 5 folds (If true, runs a 5 fold validation, if false, all results are evaluated on one fold)
 RUN_5_FOLD = False
 # Number of epochs to run for each fold of each dataset
-EPOCHS = 35
+EPOCHS = 50
 # Batch size to use
 BATCH_SIZE = 50
 # List of the names of the datasets to evaluate ("MR": movie reviews)

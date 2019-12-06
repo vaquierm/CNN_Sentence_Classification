@@ -44,7 +44,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
 
         model = get_cnn(input_shape=X[0].shape, num_categories=num_classes, embedding_matrix=embeddings, embedding_option=embedding_option)
 
-        reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.5, patience=3, verbose=0, min_lr=0.00001)
+        reduce_lr = ReduceLROnPlateau(monitor='val_acc', factor=0.5, patience=6, verbose=0, min_lr=0.00001)
         model_checkpoint = ModelCheckpoint("temp.h5", monitor='val_acc', mode='max', verbose=0, save_best_only=True)
         history = model.fit(x=x_train, y=to_categorical(y_train), batch_size=BATCH_SIZE, epochs=EPOCHS, verbose=2 if PRINT_EPOCH_UPDATES else 0, callbacks=[model_checkpoint, reduce_lr], validation_data=(x_test, to_categorical(y_test)))
 
