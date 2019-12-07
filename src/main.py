@@ -103,44 +103,59 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
 
     # run trials and keep parameter if best accuracy so far
     for kernel_sizes in KERNEL_SIZES_INCREMENTAL:
+        print("\n\tAttempting with kernel sizes:" + str(kernel_sizes))
         # Perform a 5 fold cross validation
         accuracy = k_fold_cv(dataset, vec_type, embedding_option,
                              kernel_sizes=kernel_sizes, dropout_rate=best_dropout_rate, optimizer=best_optimizer,
                              feature_maps=best_feature_map, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
+            print("\n\tNew best kernel sizes found!")
             best_kernel_size = kernel_sizes
+    print("\n\tSet best kernel sizes as:" + str(best_kernel_size))
 
     for regularization_strength in REGULARIZATION_STRENGTH_INCREMENTAL:
+        print("\n\tAttempting with regularization strength:" + str(regularization_strength))
         # Perform a 5 fold cross validation
         accuracy = k_fold_cv(dataset, vec_type, embedding_option,
                              kernel_sizes=best_kernel_size, dropout_rate=best_dropout_rate, optimizer=best_optimizer,
                              feature_maps=best_feature_map, regularization_strength=regularization_strength)
         if accuracy > best_accuracy:
+            print("\n\tNew best regularization strength found!")
             best_regularization_strength = regularization_strength
+    print("\n\tSet best regularization strength as:" + str(best_regularization_strength))
 
     for optimizer in OPTIMIZER_INCREMENTAL:
+        print("\n\tAttempting with optimizer:" + optimizer)
         # Perform a 5 fold cross validation
         accuracy = k_fold_cv(dataset, vec_type, embedding_option,
                              kernel_sizes=best_kernel_size, dropout_rate=best_dropout_rate, optimizer=optimizer,
                              feature_maps=best_feature_map, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
+            print("\n\tNew best optimizer found!")
             best_optimizer = optimizer
+    print("\n\tSet best optimizer as:" + str(best_optimizer))
 
     for dropout_rate in DROPOUT_RATE_INCREMENTAL:
+        print("\n\tAttempting with dropout rate:" + str(dropout_rate))
         # Perform a 5 fold cross validation
         accuracy = k_fold_cv(dataset, vec_type, embedding_option,
                              kernel_sizes=best_kernel_size, dropout_rate=dropout_rate, optimizer=best_optimizer,
                              feature_maps=best_feature_map, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
+            print("\n\tNew best dropout rate found!")
             best_dropout_rate = dropout_rate
+    print("\n\tSet best dropout rate as:" + str(best_dropout_rate))
 
     for feature_maps in FEATURE_MAPS_INCREMENTAL:
+        print("\n\tAttempting with feature maps:" + str(feature_maps))
         # Perform a 5 fold cross validation
         accuracy = k_fold_cv(dataset, vec_type, embedding_option,
                              kernel_sizes=best_kernel_size, dropout_rate=best_dropout_rate, optimizer=best_optimizer,
                              feature_maps=feature_maps, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
+            print("\n\tNew best feature maps found!")
             best_feature_map = feature_maps
+    print("\n\tSet best feature maps as:" + str(best_feature_map))
 
     # Print results
     print("\nBest accuracy of " + best_accuracy + " achieved for:\n\tkernel sizes: " + str(best_kernel_size) + "\n\t# feature maps: " + str(best_feature_map) + "\n\tRegularization strength: " + str(best_regularization_strength) + "\n\tDropout rate: " + str(best_dropout_rate) + "\n\tOptimizer: " + best_optimizer)
