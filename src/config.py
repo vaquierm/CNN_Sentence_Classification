@@ -52,7 +52,7 @@ EMBEDDING_OPTIONS = ["static", "dynamic"]
 
 ############# Configuration to run incremental best model finder ##############
 # If True, will run the incremental best model
-RUN_INCREMENTAL_BEST_PARAMS = True
+RUN_INCREMENTAL_BEST_PARAMS = False
 
 # Enter below the variables to explore
 FEATURE_MAPS_INCREMENTAL = [10, 25, 50, 100, 200, 400, 500]

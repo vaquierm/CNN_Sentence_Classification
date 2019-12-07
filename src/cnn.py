@@ -2,7 +2,9 @@ from src.config import WORD_VEC_LEN
 
 import numpy as np
 from keras import Input, Model, regularizers
-from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
+from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate, Layer, InputSpec, Conv2D
+import keras.backend as K
+import tensorflow as tf
 
 
 def get_model_config_string(kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength):
@@ -70,6 +72,7 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     model = Model(inputs=input, outputs=out)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
+    model.summary()
     return model
 
 
@@ -82,7 +85,31 @@ def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int, feature
     :return: The output tensor
     """
     out = Conv1D(filters=feature_maps, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(input)
+
+    out = GlobalMaxPoolZeroOutNonMax()(out)
+
+    out = Conv2D(filters=feature_maps, kernel_size=(kernel_size, WORD_VEC_LEN), activation='relu')(out)
+
     out = MaxPooling1D(pool_size=max_word_length - kernel_size + 1, strides=None, padding='valid',
                           name='max_pooling_k' + str(kernel_size))(out)
     out = Flatten(name='flatten_k' + str(kernel_size))(out)
     return out
+
+
+class GlobalMaxPoolZeroOutNonMax(Layer):
+
+    def __init__(self, **kwargs):
+        super(GlobalMaxPoolZeroOutNonMax, self).__init__(**kwargs)
+        self.input_spec = InputSpec(ndim=3)
+        self.data_format = K.normalize_data_format('channels_last')
+
+    def compute_output_shape(self, input_shape):
+        return input_shape
+
+    def call(self, inputs):
+        raise NotImplemented
+
+    def get_config(self):
+        config = {'data_format': self.data_format}
+        base_config = super(GlobalMaxPoolZeroOutNonMax, self).get_config()
+        return dict(list(base_config.items()) + list(config.items()))
