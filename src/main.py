@@ -78,7 +78,7 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
     print("\tAverage accuracy: " + str(average_accuracy))
 
     if save_results:
-        result_sub_dir = os.path.join(results_path, dataset, embedding_option, vec_type, get_model_config_string())
+        result_sub_dir = os.path.join(results_path, dataset, embedding_option, vec_type, get_model_config_string(kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength))
 
         # Create the subfolder if it does not exist
         if not os.path.exists(result_sub_dir):
