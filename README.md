@@ -1,4 +1,4 @@
-# CNN_Snetence_Classification
+# CNN_Sentence_Classification
 
 packages needed:
 
