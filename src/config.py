@@ -30,11 +30,14 @@ DROPOUT_RATE = 0.5
 # OPTIMIZER options include adadelta, adam, rmsprop, sgd...
 OPTIMIZER = "adadelta"
 
+
 ############# Configuration to run main ##############
 # If True, one print statement will be printed every epoch
 PRINT_EPOCH_UPDATES = False
-# Run 5 folds (If true, runs a 5 fold validation, if false, all results are evaluated on one fold)
-RUN_5_FOLD = True
+# Set number of folds to run (out of 5)
+FOLDS_TO_RUN = 3
+# Set total number k of splits for k fold
+NUMBER_OF_SPLITS = 5
 # Number of epochs to run for each fold of each dataset
 EPOCHS = 50
 # Batch size to use
@@ -45,3 +48,19 @@ DATASETS = ["SUBJ", "MR"]
 VECTOR_TYPES = ["random", "word2vec"]
 # Declare if the embeddings should be static or dynamic (options are: "static", "dynamic")
 EMBEDDING_OPTIONS = ["static", "dynamic"]
+
+
+############# Configuration to run incremental best model finder ##############
+# If True, will run the incremental best model
+RUN_INCREMENTAL_BEST_PARAMS = True
+
+# Enter below the variables to explore
+FEATURE_MAPS_INCREMENTAL = [10, 25, 50, 100, 200, 400, 500]
+KERNEL_SIZES_INCREMENTAL = [[1], [2],[3], [4], [5], [6], [7],
+                                [1,2], [2,3], [3,4], [4,5], [5,6], [6,7],
+                                [1, 2, 3], [2, 3, 4], [3, 4, 5], [4, 5, 6], [5, 6, 7],
+                                [1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6], [4, 5, 6, 7]
+                            ]
+REGULARIZATION_STRENGTH_INCREMENTAL = [0, 0.0001, 0.0003, 0.0005, 0.001, 0.0015, 0.002, 0.005, 0.01]
+DROPOUT_RATE_INCREMENTAL = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+OPTIMIZER_INCREMENTAL = ["adadelta", "adam", "rmsprop", "sgd", "adagrad", "adamax", "nadam"]
