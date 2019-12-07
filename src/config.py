@@ -34,8 +34,10 @@ OPTIMIZER = "adadelta"
 ############# Configuration to run main ##############
 # If True, one print statement will be printed every epoch
 PRINT_EPOCH_UPDATES = False
-# Run 5 folds (If true, runs a 5 fold validation, if false, all results are evaluated on one fold)
-RUN_5_FOLD = True
+# Set number of folds to run (out of 5)
+FOLDS_TO_RUN = 3
+# Set total number k of splits for k fold
+NUMBER_OF_SPLITS = 5
 # Number of epochs to run for each fold of each dataset
 EPOCHS = 50
 # Batch size to use

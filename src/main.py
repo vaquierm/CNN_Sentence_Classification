@@ -1,8 +1,8 @@
 # This is the main script that will train, evaluate, and generate results
-from src.config import RUN_5_FOLD, VECTOR_TYPES, DATASETS, EMBEDDING_OPTIONS, EPOCHS, BATCH_SIZE, KERNEL_SIZES, \
+from src.config import VECTOR_TYPES, DATASETS, EMBEDDING_OPTIONS, EPOCHS, BATCH_SIZE, KERNEL_SIZES, \
     results_path, PRINT_EPOCH_UPDATES, FEATURE_MAPS, REGULARIZATION_STRENGTH, DROPOUT_RATE, OPTIMIZER, \
     RUN_INCREMENTAL_BEST_PARAMS, KERNEL_SIZES_INCREMENTAL, DROPOUT_RATE_INCREMENTAL, FEATURE_MAPS_INCREMENTAL, \
-    OPTIMIZER_INCREMENTAL, REGULARIZATION_STRENGTH_INCREMENTAL
+    OPTIMIZER_INCREMENTAL, REGULARIZATION_STRENGTH_INCREMENTAL, FOLDS_TO_RUN, NUMBER_OF_SPLITS
 from src.data_processing.data_loading import get_data_loader
 from src.cnn import get_cnn, get_model_config_string
 from src.util.results import save_training_history, save_confusion_matrix, compute_average_histories
@@ -15,7 +15,7 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 from keras.utils import to_categorical
 
 
-def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, save_results: bool = True,
+def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = NUMBER_OF_SPLITS, save_results: bool = True,
               kernel_sizes=KERNEL_SIZES, dropout_rate=DROPOUT_RATE, optimizer=OPTIMIZER, feature_maps=FEATURE_MAPS, regularization_strength=REGULARIZATION_STRENGTH):
     """
     Performs a k fold cross validation os the specific vector type and dataset
@@ -31,6 +31,9 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
     :param feature_maps: feature maps to use
     :return average_accuracy: the average accuracy of the folds
     """
+    if FOLDS_TO_RUN > k or FOLDS_TO_RUN <= 0 or k <= 0:
+        raise Exception("Number of folds to run cannot exceed the number of splits and cannot be less or equal to 0")
+
     data_loader = get_data_loader(dataset)
 
     # Load the dataset with the correct vector representation
@@ -66,14 +69,13 @@ def k_fold_cv(dataset: str, vec_type: str, embedding_option: str, k: int = 5, sa
         # Accumulate the results
         histories.append(history.history)
         confusion_mat += confusion_matrix(y_test, y_pred)
-        # If we must run all 5 folds, we calculate the average of all 5 val acc. If not, just use th one obtained in this fold
-        if RUN_5_FOLD:
-            average_accuracy += accuracy_score(y_test, y_pred) / k
-        else:
-            average_accuracy += accuracy_score(y_test, y_pred)
-            break
+
+        # Break once we have reached the desired number of folds
+        average_accuracy += accuracy_score(y_test, y_pred) / FOLDS_TO_RUN
 
         i += 1
+        if i >= FOLDS_TO_RUN:
+            break
 
     print("\tAverage accuracy: " + str(average_accuracy))
 
@@ -163,7 +165,7 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
     print("\n\tSet best feature maps as:" + str(best_feature_map))
 
     # Print results
-    print("\nBest accuracy of " + best_accuracy + " achieved for:\n\tkernel sizes: " + str(best_kernel_size) + "\n\t# feature maps: " + str(best_feature_map) + "\n\tRegularization strength: " + str(best_regularization_strength) + "\n\tDropout rate: " + str(best_dropout_rate) + "\n\tOptimizer: " + best_optimizer)
+    print("\nBest accuracy of " + str(best_accuracy) + " achieved for:\n\tkernel sizes: " + str(best_kernel_size) + "\n\t# feature maps: " + str(best_feature_map) + "\n\tRegularization strength: " + str(best_regularization_strength) + "\n\tDropout rate: " + str(best_dropout_rate) + "\n\tOptimizer: " + best_optimizer)
 
 
 def main():
