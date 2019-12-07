@@ -1,25 +1,30 @@
-from src.config import WORD_VEC_LEN, FEATURE_MAPS, KERNEL_SIZES, REGULARIZATION_STRENGTH, OPTIMIZER, DROPOUT_RATE
+from src.config import WORD_VEC_LEN
 
 import numpy as np
 from keras import Input, Model, regularizers
 from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
 
 
-def get_model_config_string():
+def get_model_config_string(kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength):
     """
     Get a string encoding the configuration of the model used
     :return: String representation of the configuration used
     """
-    return "FeatureMaps=" + str(FEATURE_MAPS) + "_KernelSizes=" + str(KERNEL_SIZES).replace(' ', '') + "Regularization=" + str(REGULARIZATION_STRENGTH) + "_Dropout=" + str(DROPOUT_RATE) + "_Optimizer=" + OPTIMIZER
+    return "FeatureMaps=" + str(feature_maps) + "_KernelSizes=" + str(kernel_sizes).replace(' ', '') + "Regularization=" + str(regularization_strength) + "_Dropout=" + str(dropout_rate) + "_Optimizer=" + optimizer
 
 
-def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarray, embedding_option: str):
+def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarray, embedding_option: str, kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength):
     """
     Get the CNN for text classification
     :param input_shape: Should be (max_words_in_sample,)
     :param num_categories: The number of classes
     :param embedding_matrix: The matrix used for word embeddings
     :param embedding_option: Weather or not the embedding is static or dynamic
+    :param kernel_sizes: kernel sizes to use
+    :param dropout_rate: dropout rate to use
+    :param regularization_strength: regularization strength to use
+    :param optimizer: optimizer to use
+    :param feature_maps: feature maps to use
     :return: Model
     """
     if len(input_shape) > 1:
@@ -32,7 +37,7 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     else:
         raise Exception("The embedding option: " + embedding_option + " is not known. (Must be 'static' or 'dynamic')")
 
-    if REGULARIZATION_STRENGTH < 0:
+    if regularization_strength < 0:
         raise Exception("Regularization strength cannot be negative, it must be a small positive number")
 
     max_word_length = input_shape[0]
@@ -43,8 +48,8 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
     flow = Embedding(input_dim=embedding_matrix.shape[0], output_dim=WORD_VEC_LEN, input_length=max_word_length, weights=[embedding_matrix], trainable=(not static_embedding), name='embedding')(input)
 
     convs = []
-    for kernel_size in KERNEL_SIZES:
-        convs.append(__get_conv_pool_layer(flow, max_word_length, kernel_size))
+    for kernel_size in kernel_sizes:
+        convs.append(__get_conv_pool_layer(flow, max_word_length, kernel_size, feature_maps, regularization_strength))
 
     if len(convs) == 0:
         raise Exception("The model needs at least one convolution layer")
@@ -55,20 +60,20 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
         out = concatenate(convs, axis=-1)
 
     # Add the dropout layer
-    if ((not type(DROPOUT_RATE) == float) and (not type(DROPOUT_RATE) == int)) or DROPOUT_RATE >= 1 or DROPOUT_RATE < 0:
+    if ((not type(dropout_rate) == float) and (not type(dropout_rate) == int)) or dropout_rate >= 1 or dropout_rate < 0:
         raise Exception("The dropout rate must be between 0 and 1")
 
-    out = Dropout(DROPOUT_RATE)(out)
+    out = Dropout(dropout_rate)(out)
 
-    out = Dense(num_categories, activation='softmax', name='output', kernel_regularizer=regularizers.l2(REGULARIZATION_STRENGTH))(out)
+    out = Dense(num_categories, activation='softmax', name='output', kernel_regularizer=regularizers.l2(regularization_strength))(out)
 
     model = Model(inputs=input, outputs=out)
-    model.compile(loss='categorical_crossentropy', optimizer=OPTIMIZER, metrics=['accuracy'])
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
 
     return model
 
 
-def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int):
+def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int, feature_maps, regularization_strength):
     """
     Create a 1D convolution layer followed by a max over time pooling
     :param input: Input tensor
@@ -76,7 +81,7 @@ def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int):
     :param kernel_size: Size of window
     :return: The output tensor
     """
-    out = Conv1D(filters=FEATURE_MAPS, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(REGULARIZATION_STRENGTH))(input)
+    out = Conv1D(filters=feature_maps, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(input)
     out = MaxPooling1D(pool_size=max_word_length - kernel_size + 1, strides=None, padding='valid',
                           name='max_pooling_k' + str(kernel_size))(out)
     out = Flatten(name='flatten_k' + str(kernel_size))(out)
