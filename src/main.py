@@ -110,6 +110,7 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
                              feature_maps=best_feature_map, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
             print("\n\tNew best kernel sizes found!")
+            best_accuracy = accuracy
             best_kernel_size = kernel_sizes
     print("\n\tSet best kernel sizes as:" + str(best_kernel_size))
 
@@ -121,6 +122,7 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
                              feature_maps=best_feature_map, regularization_strength=regularization_strength)
         if accuracy > best_accuracy:
             print("\n\tNew best regularization strength found!")
+            best_accuracy = accuracy
             best_regularization_strength = regularization_strength
     print("\n\tSet best regularization strength as:" + str(best_regularization_strength))
 
@@ -132,6 +134,7 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
                              feature_maps=best_feature_map, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
             print("\n\tNew best optimizer found!")
+            best_accuracy = accuracy
             best_optimizer = optimizer
     print("\n\tSet best optimizer as:" + str(best_optimizer))
 
@@ -143,6 +146,7 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
                              feature_maps=best_feature_map, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
             print("\n\tNew best dropout rate found!")
+            best_accuracy = accuracy
             best_dropout_rate = dropout_rate
     print("\n\tSet best dropout rate as:" + str(best_dropout_rate))
 
@@ -154,6 +158,7 @@ def incremental_search_best_params(dataset: str, vec_type: str, embedding_option
                              feature_maps=feature_maps, regularization_strength=best_regularization_strength)
         if accuracy > best_accuracy:
             print("\n\tNew best feature maps found!")
+            best_accuracy = accuracy
             best_feature_map = feature_maps
     print("\n\tSet best feature maps as:" + str(best_feature_map))
 
