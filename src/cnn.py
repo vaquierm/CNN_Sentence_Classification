@@ -2,7 +2,7 @@ from src.config import WORD_VEC_LEN
 
 import numpy as np
 from keras import Input, Model, regularizers
-from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate
+from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate, Reshape, Conv2D, GlobalMaxPooling1D
 
 
 def get_model_config_string(kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength):
@@ -69,7 +69,7 @@ def get_cnn(input_shape: tuple, num_categories: int, embedding_matrix: np.ndarra
 
     model = Model(inputs=input, outputs=out)
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics=['accuracy'])
-
+    model.summary()
     return model
 
 
@@ -82,7 +82,17 @@ def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int, feature
     :return: The output tensor
     """
     out = Conv1D(filters=feature_maps, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(input)
-    out = MaxPooling1D(pool_size=max_word_length - kernel_size + 1, strides=None, padding='valid',
-                          name='max_pooling_k' + str(kernel_size))(out)
+
+    # Reshape the tensor to get one more dimension
+    out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[2].value, 1))(out)
+
+    # Perform a temporal cross feature convolution
+    out = Conv2D(filters=feature_maps, kernel_size=(kernel_size, feature_maps), activation='relu', name='2D_conv_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(out)
+
+    # Reshape back
+    out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[3].value))(out)
+
+    out = MaxPooling1D(pool_size=out.shape.dims[1].value, strides=None, padding='valid',name='max_pooling_k' + str(kernel_size))(out)
+
     out = Flatten(name='flatten_k' + str(kernel_size))(out)
     return out
