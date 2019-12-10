@@ -2,7 +2,8 @@ from src.config import WORD_VEC_LEN
 
 import numpy as np
 from keras import Input, Model, regularizers
-from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate, Reshape, Conv2D, GlobalMaxPooling1D
+from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate, Reshape, Conv2D, Lambda
+import tensorflow as tf
 
 
 def get_model_config_string(kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength):
@@ -82,6 +83,13 @@ def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int, feature
     :return: The output tensor
     """
     out = Conv1D(filters=feature_maps, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(input)
+
+    def tensor(a):
+        b = tf.reduce_max(a, axis=1, keepdims=True)
+        result = tf.where(tf.less(a, b), tf.zeros_like(a), a)
+        return result
+
+    #out = Lambda(lambda x: tensor(x))(out)
 
     # Reshape the tensor to get one more dimension
     out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[2].value, 1))(out)
