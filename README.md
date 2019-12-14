@@ -1,10 +1,10 @@
-# CNN_Sentence_Classification
+# CNN Sentence Classification
 This repository implements a Convolutional Neural Network for Sentence Classification, based on the work of Yoon Kim ([original paper](https://arxiv.org/pdf/1408.5882.pdf)). 
 
 ## Datasets Used
 
 ### Movie Review
-The [Movie Review dataset](https://www.cs.cornell.edu/people/pabo/movie-review-data/) contains 700 labelled positive and 700 labelled negative reviews from IMDb.
+The [Movie Review dataset](https://www.cs.cornell.edu/people/pabo/movie-review-data/) contains 5331 labelled positive and 5331 labelled negative reviews from IMDb.
 Download the **sentence polarity dataset v1.0** file and extract it. Place it under the `data/` folder, as shown in the file directory structure below.
 
 ### Subjectivity
@@ -19,14 +19,16 @@ The hyper-parameter values are explored and set one by one.
 ## Architectural Changes
 To address the loss of temporal information in Kim's original model, the architecture of the CNN was modified by reshaping and performing a 2D convolution before pooling and feeding the results to a dense layer.
 
+<p align="center"><img width="400" src="img/tensor.png"/></p>
+
 ## Packages Needed
 
 - gensim
 - nltk
 
-## Tool for Vector Representation
+## Word Embeddings
 
-This project makes use of Google's word2vec tool, which constructs vector representations of words through their implementation of continuous bag-of-words and skip-gram.
+This project makes use of Google's word2vec embeddings, which constructs vector representations of words through their implementation of continuous bag-of-words and skip-gram.
 Download the [GoogleNews-vectors-negative300.bin](https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz) file, and place it under the `data/` folder.
 
 
@@ -45,29 +47,29 @@ Download the [GoogleNews-vectors-negative300.bin](https://s3.amazonaws.com/dl4j-
 ```
 .
 +-- data
-¦   +-- GoogleNews-vectors-negative300.bin
-¦   ¦
-¦   +-- rt-polaritydata
-¦   ¦   +-- rt-polarity.neg
-¦   ¦   +-- rt-polarity.pos
-¦   ¦
-¦   +-- SUBJ
-¦       +-- plot.tok.gt9.5000
-¦       +-- quote.tok.gt9.5000
-¦
+ï¿½   +-- GoogleNews-vectors-negative300.bin
+ï¿½   ï¿½
+ï¿½   +-- rt-polaritydata
+ï¿½   ï¿½   +-- rt-polarity.neg
+ï¿½   ï¿½   +-- rt-polarity.pos
+ï¿½   ï¿½
+ï¿½   +-- SUBJ
+ï¿½       +-- plot.tok.gt9.5000
+ï¿½       +-- quote.tok.gt9.5000
+ï¿½
 +-- results
-¦
+ï¿½
 +-- src
     +-- config.py
-    ¦
+    ï¿½
     +-- main.py
     +-- cnn.py
-    ¦
+    ï¿½
     +-- data_processing
-    ¦   +-- data_cleaning.py
-    ¦   +-- data_loading.py
-    ¦   +-- word_vectorizing.py
-    ¦
+    ï¿½   +-- data_cleaning.py
+    ï¿½   +-- data_loading.py
+    ï¿½   +-- word_vectorizing.py
+    ï¿½
     +-- util
         +-- results.py
 ```
@@ -80,4 +82,4 @@ Files in `src/`:
 * `main.py` is a script that trains, evaluates and generates results through k-fold cross validation.
 * `cnn.py` contains the implementation of the convolutional neural network for sentence classification.
 * `util/results.py` defines the functionalities needed to save results of runs to files.
-* `data_processing/` has the scripts necessary for different data processing strategies.
+* `data_processing/` has the logic necessary for different data processing strategies.
