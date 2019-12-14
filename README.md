@@ -73,7 +73,7 @@ Download the [GoogleNews-vectors-negative300.bin](https://s3.amazonaws.com/dl4j-
     └── util
         └── results.py
 ```
-The `data/` folder holds the Moview Review and Subjectivity datasets. <br />
+The `data/` folder holds the Movie Review and Subjectivity datasets. <br />
 
 Any results are placed automatically in the `results/` folder. These results include confusion matrices, and loss and accuracy graphs. <br />
 
