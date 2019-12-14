@@ -1,12 +1,15 @@
 # CNN_Sentence_Classification
 This repository implements a Convolutional Neural Network for Sentence Classification, based on the work of Yoon Kim ([original paper](https://arxiv.org/pdf/1408.5882.pdf)). 
+
 ## Datasets Used
 
 ### Movie Review
-[Movie review dataset](https://www.cs.cornell.edu/people/pabo/movie-review-data/) (Download the **sentence polarity dataset v1.0** file and extract it.)
+The [Movie Review dataset](https://www.cs.cornell.edu/people/pabo/movie-review-data/) contains 700 labelled positive and 700 labelled negative reviews from IMDb.
+Download the **sentence polarity dataset v1.0** file and extract it. Place it under the `data/` folder, as shown in the file directory structure below.
 
 ### Subjectivity
-[Subjectivity dataset](https://www.cs.cornell.edu/people/pabo/movie-review-data/) (Download the **Subjectivity dataset v1.0** file and extract it.)
+The [Subjectivity dataset](https://www.cs.cornell.edu/people/pabo/movie-review-data/) contains 5000 labelled subjective and 5000 labelled objective snippets from movie reviews from Rotten Tomatoes and IMDb.
+Download the **Subjectivity dataset v1.0** file and extract it. Place it under the `data/` folder, as shown in the file directory structure below.
 
 
 ## Hyper-parameter Search
@@ -14,14 +17,17 @@ To improve on the baseline accuracy, an extensive incremental hyper-parameter se
 The hyper-parameter values are explored and set one by one.
 
 ## Architectural Changes
-
-
+To address the loss of temporal information in Kim's original model, the architecture of the CNN was modified by reshaping and performing a 2D convolution before pooling and feeding the results to a dense layer.
 
 ## Packages Needed
 
 - gensim
 - nltk
-- GoogleNews-vectors-negative300.bin
+
+## Tool for Vector Representation
+
+This project makes use of Google's word2vec tool, which constructs vector representations of words through their implementation of continuous bag-of-words and skip-gram.
+Download the [GoogleNews-vectors-negative300.bin](https://s3.amazonaws.com/dl4j-distribution/GoogleNews-vectors-negative300.bin.gz) file, and place it under the `data/` folder.
 
 
 ## How to Run the Program
