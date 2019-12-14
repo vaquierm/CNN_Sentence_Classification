@@ -46,32 +46,32 @@ Download the [GoogleNews-vectors-negative300.bin](https://s3.amazonaws.com/dl4j-
 ## Directory Structure
 ```
 .
-+-- data
-�   +-- GoogleNews-vectors-negative300.bin
-�   �
-�   +-- rt-polaritydata
-�   �   +-- rt-polarity.neg
-�   �   +-- rt-polarity.pos
-�   �
-�   +-- SUBJ
-�       +-- plot.tok.gt9.5000
-�       +-- quote.tok.gt9.5000
-�
-+-- results
-�
-+-- src
-    +-- config.py
-    �
-    +-- main.py
-    +-- cnn.py
-    �
-    +-- data_processing
-    �   +-- data_cleaning.py
-    �   +-- data_loading.py
-    �   +-- word_vectorizing.py
-    �
-    +-- util
-        +-- results.py
+├── data
+|   ├── GoogleNews-vectors-negative300.bin
+|   |
+|   ├── rt-polaritydata
+|   |   ├── rt-polarity.neg
+|   |   └── rt-polarity.pos
+|   |
+|   └── SUBJ
+|       ├── plot.tok.gt9.5000
+|       └── quote.tok.gt9.5000
+|
+├── results
+|
+└── src
+    ├── config.py
+    |
+    ├── main.py
+    ├── cnn.py
+    |
+    ├── data_processing
+    |   ├── data_cleaning.py
+    |   ├── data_loading.py
+    |   └── word_vectorizing.py
+    |
+    └── util
+        └── results.py
 ```
 The `data/` folder holds the Moview Review and Subjectivity datasets. <br />
 
