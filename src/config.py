@@ -18,6 +18,9 @@ WORD_VEC_LEN = 300
 
 
 ############# Model Configurations #############
+# If true this performs a modification to the default model
+# to apply an additional convolution that spans across the different features
+CROSS_FEATURE_CONV = False
 # Default 100
 FEATURE_MAPS = 100
 # Default [3, 4, 5]
