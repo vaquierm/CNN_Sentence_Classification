@@ -1,9 +1,8 @@
-from src.config import WORD_VEC_LEN
+from src.config import WORD_VEC_LEN, CROSS_FEATURE_CONV
 
 import numpy as np
 from keras import Input, Model, regularizers
-from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate, Reshape, Conv2D, Lambda
-import tensorflow as tf
+from keras.layers import Dense, Dropout, Flatten, Embedding, Conv1D, MaxPooling1D, concatenate, Reshape, Conv2D
 
 
 def get_model_config_string(kernel_sizes, dropout_rate, optimizer, feature_maps, regularization_strength):
@@ -84,21 +83,16 @@ def __get_conv_pool_layer(input, max_word_length: int, kernel_size: int, feature
     """
     out = Conv1D(filters=feature_maps, kernel_size=kernel_size, activation='relu', name='convolution_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(input)
 
-    def tensor(a):
-        b = tf.reduce_max(a, axis=1, keepdims=True)
-        result = tf.where(tf.less(a, b), tf.zeros_like(a), a)
-        return result
+    # Perform the extra steps if cross feature convolution is required
+    if CROSS_FEATURE_CONV:
+        # Reshape the tensor to get one more dimension
+        out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[2].value, 1))(out)
 
-    #out = Lambda(lambda x: tensor(x))(out)
+        # Perform a temporal cross feature convolution
+        out = Conv2D(filters=feature_maps, kernel_size=(kernel_size, feature_maps), activation='relu', name='2D_conv_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(out)
 
-    # Reshape the tensor to get one more dimension
-    out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[2].value, 1))(out)
-
-    # Perform a temporal cross feature convolution
-    out = Conv2D(filters=feature_maps, kernel_size=(kernel_size, feature_maps), activation='relu', name='2D_conv_k' + str(kernel_size), kernel_regularizer=regularizers.l2(regularization_strength))(out)
-
-    # Reshape back
-    out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[3].value))(out)
+        # Reshape back
+        out = Reshape(target_shape=(out.shape.dims[1].value, out.shape.dims[3].value))(out)
 
     out = MaxPooling1D(pool_size=out.shape.dims[1].value, strides=None, padding='valid',name='max_pooling_k' + str(kernel_size))(out)
 
